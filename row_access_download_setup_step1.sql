@@ -1,0 +1,184 @@
+-- ============================================
+-- ROW ACCESS CONTROL DEMO - SETUP SCRIPT
+-- ============================================
+-- This script creates a demo environment to showcase 
+-- row-level security with a Streamlit application.
+-- 
+-- Prerequisites:
+-- - ACCOUNTADMIN role (or role with CREATE DATABASE/WAREHOUSE privileges)
+-- ============================================
+
+USE ROLE ACCOUNTADMIN;
+
+-- ============================================
+-- 1. CREATE WAREHOUSE
+-- ============================================
+CREATE WAREHOUSE IF NOT EXISTS WH_TESTING
+    WAREHOUSE_SIZE = 'XSMALL'
+    AUTO_SUSPEND = 60
+    AUTO_RESUME = TRUE;
+
+USE WAREHOUSE WH_TESTING;
+
+-- ============================================
+-- 2. CREATE DATABASE AND SCHEMA
+-- ============================================
+CREATE OR REPLACE TRANSIENT DATABASE Streamlit_Mock_Data;
+CREATE OR REPLACE TRANSIENT SCHEMA Streamlit_Mock_Data.DEMO;
+
+-- ============================================
+-- 3. CREATE TABLES
+-- ============================================
+CREATE OR REPLACE TABLE Streamlit_Mock_Data.DEMO.EMPLOYEES (
+    EMPLOYEE_ID INT,
+    EMPLOYEE_NAME VARCHAR(100),
+    DEPARTMENT VARCHAR(50),
+    SALARY DECIMAL(10,2),
+    REGION VARCHAR(50),
+    HIRE_DATE DATE
+);
+
+CREATE OR REPLACE TABLE Streamlit_Mock_Data.DEMO.CUSTOMERS (
+    CUSTOMER_ID INT,
+    CUSTOMER_NAME VARCHAR(100),
+    EMAIL VARCHAR(100),
+    REGION VARCHAR(50),
+    SIGNUP_DATE DATE
+);
+
+CREATE OR REPLACE TABLE Streamlit_Mock_Data.DEMO.ORDERS (
+    ORDER_ID INT,
+    CUSTOMER_ID INT,
+    ORDER_DATE DATE,
+    TOTAL_AMOUNT DECIMAL(10,2),
+    REGION VARCHAR(50),
+    STATUS VARCHAR(20)
+);
+
+CREATE OR REPLACE TABLE Streamlit_Mock_Data.DEMO.PRODUCTS (
+    PRODUCT_ID INT,
+    PRODUCT_NAME VARCHAR(100),
+    CATEGORY VARCHAR(50),
+    PRICE DECIMAL(10,2),
+    REGION VARCHAR(50),
+    STOCK_QTY INT
+);
+
+-- ============================================
+-- 4. POPULATE TABLES WITH 50 ROWS EACH
+-- ============================================
+INSERT INTO Streamlit_Mock_Data.DEMO.EMPLOYEES
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY SEQ4()) AS EMPLOYEE_ID,
+    'Employee_' || SEQ4() AS EMPLOYEE_NAME,
+    CASE MOD(SEQ4(), 5) 
+        WHEN 0 THEN 'Sales'
+        WHEN 1 THEN 'Marketing'
+        WHEN 2 THEN 'Engineering'
+        WHEN 3 THEN 'Finance'
+        ELSE 'HR'
+    END AS DEPARTMENT,
+    ROUND(40000 + UNIFORM(0, 80000, RANDOM()), 2) AS SALARY,
+    CASE MOD(SEQ4(), 4)
+        WHEN 0 THEN 'NORTH'
+        WHEN 1 THEN 'SOUTH'
+        WHEN 2 THEN 'EAST'
+        ELSE 'WEST'
+    END AS REGION,
+    DATEADD(DAY, -UNIFORM(1, 2000, RANDOM()), CURRENT_DATE()) AS HIRE_DATE
+FROM TABLE(GENERATOR(ROWCOUNT => 50));
+
+INSERT INTO Streamlit_Mock_Data.DEMO.CUSTOMERS
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY SEQ4()) AS CUSTOMER_ID,
+    'Customer_' || SEQ4() AS CUSTOMER_NAME,
+    'customer' || SEQ4() || '@email.com' AS EMAIL,
+    CASE MOD(SEQ4(), 4)
+        WHEN 0 THEN 'NORTH'
+        WHEN 1 THEN 'SOUTH'
+        WHEN 2 THEN 'EAST'
+        ELSE 'WEST'
+    END AS REGION,
+    DATEADD(DAY, -UNIFORM(1, 365, RANDOM()), CURRENT_DATE()) AS SIGNUP_DATE
+FROM TABLE(GENERATOR(ROWCOUNT => 50));
+
+INSERT INTO Streamlit_Mock_Data.DEMO.ORDERS
+SELECT 
+    1000 + ROW_NUMBER() OVER (ORDER BY SEQ4()) AS ORDER_ID,
+    UNIFORM(1, 50, RANDOM()) AS CUSTOMER_ID,
+    DATEADD(DAY, -UNIFORM(1, 180, RANDOM()), CURRENT_DATE()) AS ORDER_DATE,
+    ROUND(UNIFORM(25, 1500, RANDOM()) + UNIFORM(0, 100, RANDOM()) / 100, 2) AS TOTAL_AMOUNT,
+    CASE MOD(SEQ4(), 4)
+        WHEN 0 THEN 'NORTH'
+        WHEN 1 THEN 'SOUTH'
+        WHEN 2 THEN 'EAST'
+        ELSE 'WEST'
+    END AS REGION,
+    CASE MOD(SEQ4(), 4)
+        WHEN 0 THEN 'Completed'
+        WHEN 1 THEN 'Pending'
+        WHEN 2 THEN 'Shipped'
+        ELSE 'Cancelled'
+    END AS STATUS
+FROM TABLE(GENERATOR(ROWCOUNT => 50));
+
+INSERT INTO Streamlit_Mock_Data.DEMO.PRODUCTS
+SELECT 
+    10000 + ROW_NUMBER() OVER (ORDER BY SEQ4()) AS PRODUCT_ID,
+    'Product_' || SEQ4() AS PRODUCT_NAME,
+    CASE MOD(SEQ4(), 5)
+        WHEN 0 THEN 'Electronics'
+        WHEN 1 THEN 'Furniture'
+        WHEN 2 THEN 'Clothing'
+        WHEN 3 THEN 'Sports'
+        ELSE 'Home'
+    END AS CATEGORY,
+    ROUND(UNIFORM(10, 2000, RANDOM()) + UNIFORM(0, 100, RANDOM()) / 100, 2) AS PRICE,
+    CASE MOD(SEQ4(), 4)
+        WHEN 0 THEN 'NORTH'
+        WHEN 1 THEN 'SOUTH'
+        WHEN 2 THEN 'EAST'
+        ELSE 'WEST'
+    END AS REGION,
+    UNIFORM(1, 500, RANDOM()) AS STOCK_QTY
+FROM TABLE(GENERATOR(ROWCOUNT => 50));
+
+-- ============================================
+-- 5. CREATE ROW ACCESS POLICY
+-- ============================================
+-- Access by role:
+--   ACCOUNTADMIN: All regions
+--   SYSADMIN: NORTH only
+--   PUBLIC: SOUTH only
+--   USERADMIN: EAST only
+
+CREATE OR REPLACE ROW ACCESS POLICY Streamlit_Mock_Data.DEMO.REGION_ACCESS_POLICY
+AS (region_val VARCHAR) RETURNS BOOLEAN ->
+    CURRENT_ROLE() = 'ACCOUNTADMIN'
+    OR (CURRENT_ROLE() = 'SYSADMIN' AND region_val = 'NORTH')
+    OR (CURRENT_ROLE() = 'PUBLIC' AND region_val = 'SOUTH')
+    OR (CURRENT_ROLE() = 'USERADMIN' AND region_val = 'EAST');
+
+-- ============================================
+-- 6. APPLY ROW ACCESS POLICY TO ALL TABLES
+-- ============================================
+ALTER TABLE Streamlit_Mock_Data.DEMO.EMPLOYEES ADD ROW ACCESS POLICY Streamlit_Mock_Data.DEMO.REGION_ACCESS_POLICY ON (REGION);
+ALTER TABLE Streamlit_Mock_Data.DEMO.CUSTOMERS ADD ROW ACCESS POLICY Streamlit_Mock_Data.DEMO.REGION_ACCESS_POLICY ON (REGION);
+ALTER TABLE Streamlit_Mock_Data.DEMO.ORDERS ADD ROW ACCESS POLICY Streamlit_Mock_Data.DEMO.REGION_ACCESS_POLICY ON (REGION);
+ALTER TABLE Streamlit_Mock_Data.DEMO.PRODUCTS ADD ROW ACCESS POLICY Streamlit_Mock_Data.DEMO.REGION_ACCESS_POLICY ON (REGION);
+
+-- ============================================
+-- 7. GRANT PERMISSIONS TO OTHER ROLES (IF APPLICABLE)
+-- ============================================
+GRANT USAGE ON DATABASE Streamlit_Mock_Data TO ROLE SYSADMIN;
+GRANT USAGE ON DATABASE Streamlit_Mock_Data TO ROLE PUBLIC;
+GRANT USAGE ON DATABASE Streamlit_Mock_Data TO ROLE USERADMIN;
+
+GRANT USAGE ON SCHEMA Streamlit_Mock_Data.DEMO TO ROLE SYSADMIN;
+GRANT USAGE ON SCHEMA Streamlit_Mock_Data.DEMO TO ROLE PUBLIC;
+GRANT USAGE ON SCHEMA Streamlit_Mock_Data.DEMO TO ROLE USERADMIN;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA Streamlit_Mock_Data.DEMO TO ROLE SYSADMIN;
+GRANT SELECT ON ALL TABLES IN SCHEMA Streamlit_Mock_Data.DEMO TO ROLE PUBLIC;
+GRANT SELECT ON ALL TABLES IN SCHEMA Streamlit_Mock_Data.DEMO TO ROLE USERADMIN;
+
