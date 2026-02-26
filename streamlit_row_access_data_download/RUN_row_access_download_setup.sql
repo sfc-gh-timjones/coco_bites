@@ -13,7 +13,7 @@ USE ROLE ACCOUNTADMIN;
 -- ============================================
 CREATE OR REPLACE API INTEGRATION COCO_BITES_GIT_API_INTEGRATION
   API_PROVIDER = git_https_api
-  API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-timjones/coco_bites')
+  API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-timjones/coco_bites.git')
   ENABLED = TRUE;
 
 -- ============================================
