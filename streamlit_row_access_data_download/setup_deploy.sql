@@ -31,8 +31,8 @@ ALTER GIT REPOSITORY STREAMLIT_MOCK_DATA.DEMO.COCO_BITES_REPO FETCH;
 -- ============================================
 -- 3. EXECUTE SETUP SCRIPTS FROM GIT
 -- ============================================
-EXECUTE IMMEDIATE FROM @STREAMLIT_MOCK_DATA.DEMO.COCO_BITES_REPO/branches/main/streamlit_row_access_data_download/row_access_download_setup_step1.sql;
-EXECUTE IMMEDIATE FROM @STREAMLIT_MOCK_DATA.DEMO.COCO_BITES_REPO/branches/main/streamlit_row_access_data_download/row_access_download_setup_step2.sql;
+EXECUTE IMMEDIATE FROM @STREAMLIT_MOCK_DATA.DEMO.COCO_BITES_REPO/branches/main/streamlit_row_access_data_download/setup_step1_data.sql;
+EXECUTE IMMEDIATE FROM @STREAMLIT_MOCK_DATA.DEMO.COCO_BITES_REPO/branches/main/streamlit_row_access_data_download/setup_step2_app.sql;
 
 --DONE. THE STREAMLIT IS BUILT. IF YOU WANT TO DELETE ALL ARTIFACTS, RUN CLEANUP STEP BELOW.
 
