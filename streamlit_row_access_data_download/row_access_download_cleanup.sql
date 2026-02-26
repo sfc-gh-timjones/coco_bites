@@ -26,6 +26,8 @@ DROP API INTEGRATION IF EXISTS COCO_BITES_GIT_API_INTEGRATION;
 -- ============================================
 DROP WAREHOUSE IF EXISTS WH_TESTING;
 
+SELECT 'STREAMLIT, DATABASE, API INTEGRATION, and VIRTUAL WAREHOUSE all dropped.';
+
 -- ============================================
 -- CLEANUP COMPLETE
 -- ============================================
