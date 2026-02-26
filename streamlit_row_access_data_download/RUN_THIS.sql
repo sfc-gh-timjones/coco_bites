@@ -29,6 +29,7 @@ CREATE OR REPLACE API INTEGRATION COCO_BITES_GIT_API_INTEGRATION
 -- ============================================
 -- 3. CREATE DATABASE/SCHEMA FOR GIT REPO
 -- ============================================
+-- Note: This git repo will be deleted when you run cleanup.sql
 CREATE DATABASE IF NOT EXISTS STREAMLIT_MOCK_DATA;
 CREATE SCHEMA IF NOT EXISTS STREAMLIT_MOCK_DATA.DEMO;
 
