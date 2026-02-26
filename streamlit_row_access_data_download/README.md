@@ -1,6 +1,6 @@
 # Row Access Control Demo
 
-A Streamlit app demonstrating Snowflake row-level security. Users can simulate different roles and see how row access policies filter data by region.
+A Streamlit app demonstrating Snowflake row-level security and downloading data directly from a Streamlit app. Users can simulate different roles and see how row access policies filter data by region.
 
 ## Quick Start
 
@@ -27,4 +27,4 @@ After it completes:
 
 ## Cleanup
 
-Uncomment the cleanup line at the end of **RUN_THIS.sql** and run it, or run **row_access_download_cleanup.sql** directly.
+Uncomment the cleanup line at the end of **RUN_THIS.sql** and run it, or run **cleanup.sql** directly.
