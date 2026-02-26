@@ -4,9 +4,14 @@ A Streamlit app demonstrating Snowflake row-level security. Users can simulate d
 
 ## Quick Start
 
-1. Open Snowflake and run **RUN_THIS.sql** as ACCOUNTADMIN
-2. Navigate to **Projects > Streamlit**
-3. Click on **ROW_ACCESS_DEMO_APP**
+1. Open Snowflake
+2. Open a Worksheet (Projects > Worksheets > + Worksheet)
+3. Copy the contents of **RUN_THIS.sql** into the worksheet
+4. Click "Run All" to execute the entire script
+
+After it completes:
+1. Navigate to **Projects > Streamlit**
+2. Click on **ROW_ACCESS_DEMO_APP**
 
 > **Note:** You may need to hard refresh your browser (Cmd+Shift+R or Ctrl+Shift+R) for the app to appear in the list.
 
