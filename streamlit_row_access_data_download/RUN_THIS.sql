@@ -21,6 +21,7 @@ USE WAREHOUSE WH_TESTING;
 -- ============================================
 -- 2. CREATE API INTEGRATION FOR GIT
 -- ============================================
+-- Note: This integration will be deleted when you run cleanup.sql
 CREATE OR REPLACE API INTEGRATION COCO_BITES_GIT_API_INTEGRATION
   API_PROVIDER = git_https_api
   API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-timjones/coco_bites')
