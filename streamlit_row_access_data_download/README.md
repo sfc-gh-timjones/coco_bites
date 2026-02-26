@@ -12,15 +12,12 @@ A Streamlit app demonstrating Snowflake row-level security. Users can simulate d
   - **USERADMIN**: EAST only
 - Deploys a Streamlit app to visualize and download filtered data
 
-## Setup Order
+## Setup
 
-Run these scripts in Snowflake as ACCOUNTADMIN:
+Run **RUN_row_access_download_setup.sql** in Snowflake as ACCOUNTADMIN - that's it!
 
-1. **row_access_download_setup_step1.sql** - Creates warehouse, database, tables, data, and row access policy
-2. **row_access_download_setup_step2.sql** - Creates git repo, stage, copies Streamlit file, and creates the app
-
-**Optional:** After initial setup, use **row_access_download_setup_step3.sql** to re-run step1 and step2 via EXECUTE IMMEDIATE from Git. This script also includes the cleanup command (commented out) for easy teardown.
+This script sets up the git repo connection and runs everything via EXECUTE IMMEDIATE.
 
 ## Cleanup
 
-Run **row_access_download_cleanup.sql** to remove all created objects, or uncomment the cleanup line in step3.
+Uncomment the cleanup line at the end of **RUN_row_access_download_setup.sql**, or run **row_access_download_cleanup.sql** directly.

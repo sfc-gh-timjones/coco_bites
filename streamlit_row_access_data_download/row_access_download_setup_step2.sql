@@ -7,18 +7,7 @@ DIRECTORY = (ENABLE = TRUE);
 -- ============================================
 -- 8. COPY STREAMLIT APP FILE TO STAGE
 -- ============================================
--- Option A: Copy from Git repo (default)
-CREATE OR REPLACE API INTEGRATION COCO_BITES_GIT_API_INTEGRATION
-  API_PROVIDER = git_https_api
-  API_ALLOWED_PREFIXES = ('https://github.com/sfc-gh-timjones/coco_bites')
-  ENABLED = TRUE;
-
-CREATE OR REPLACE GIT REPOSITORY STREAMLIT_MOCK_DATA.DEMO.COCO_BITES_REPO
-  API_INTEGRATION = COCO_BITES_GIT_API_INTEGRATION
-  ORIGIN = 'https://github.com/sfc-gh-timjones/coco_bites.git';
-
-ALTER GIT REPOSITORY STREAMLIT_MOCK_DATA.DEMO.COCO_BITES_REPO FETCH;
-
+-- Option A: Copy from Git repo (requires git repo from RUN script)
 COPY FILES
   INTO @STREAMLIT_MOCK_DATA.DEMO.STREAMLIT_STAGE
   FROM @STREAMLIT_MOCK_DATA.DEMO.COCO_BITES_REPO/branches/main/streamlit_row_access_data_download/
