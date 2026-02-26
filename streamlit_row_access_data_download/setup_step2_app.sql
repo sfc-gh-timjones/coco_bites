@@ -23,6 +23,8 @@ COPY FILES
 -- ============================================
 -- 9. CREATE STREAMLIT APP
 -- ============================================
+-- After this runs, navigate to: Projects > Streamlit
+-- You may need to hard refresh your browser (Cmd+Shift+R or Ctrl+Shift+R) for the app to appear in the list
 
 CREATE OR REPLACE STREAMLIT STREAMLIT_MOCK_DATA.DEMO.ROW_ACCESS_DEMO_APP
   FROM @STREAMLIT_MOCK_DATA.DEMO.STREAMLIT_STAGE
