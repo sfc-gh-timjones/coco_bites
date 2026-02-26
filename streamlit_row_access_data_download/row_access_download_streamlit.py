@@ -40,9 +40,9 @@ st.caption(f"Simulated Role: **{selected_role}** | Access: **{ROLE_DISPLAY[selec
 
 region_filter = ROLE_REGIONS[selected_role]
 if region_filter:
-    query = f"SELECT * FROM Streamlit_Mock_Data.DEMO.{selected_table} WHERE REGION = '{region_filter}'"
+    query = f"SELECT * FROM STREAMLIT_MOCK_DATA.DEMO.{selected_table} WHERE REGION = '{region_filter}'"
 else:
-    query = f"SELECT * FROM Streamlit_Mock_Data.DEMO.{selected_table}"
+    query = f"SELECT * FROM STREAMLIT_MOCK_DATA.DEMO.{selected_table}"
 df = session.sql(query).to_pandas()
 
 if not df.empty:
